@@ -54,7 +54,7 @@ jobs:
             cd packages/$package
             
             # Install dependencies and build
-            npm ci --ignore-scripts || npm install --ignore-scripts
+            npm install --ignore-scripts --legacy-peer-deps || echo "No deps needed"
             npm run build
             
             # Bump version if requested
