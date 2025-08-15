@@ -1,5 +1,31 @@
 import React, { createContext, useContext, ReactNode } from 'react';
-import { PermissionEngine, User, RBACConfig } from 'granular-rbac-core';
+// import { PermissionEngine, User, RBACConfig } from 'granular-rbac-core';
+
+// Temporary local type definitions for compilation
+export interface User {
+  id: number;
+  permissions?: string[];
+  roles?: Array<{ name: string; permissions: string[] }>;
+  userType?: string;
+  [key: string]: any;
+}
+
+export interface PermissionEngine {
+  validatePermission(permission: string): boolean;
+  userHasPermission(user: User | null, permission: string, tenantId?: any): boolean;
+  userHasAnyPermission(user: User | null, permissions: string[], tenantId?: any): boolean;
+  userHasAllPermissions(user: User | null, permissions: string[], tenantId?: any): boolean;
+  userHasRole(user: User | null, role: string, tenantId?: any): boolean;
+  userHasAnyRole(user: User | null, roles: string[], tenantId?: any): boolean;
+}
+
+export interface RBACConfig {
+  permissions: Record<string, any[]>;
+  tenant: {
+    field: string;
+    modelName: string;
+  };
+}
 
 interface RBACContextValue {
   user: User | null;

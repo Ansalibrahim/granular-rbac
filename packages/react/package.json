@@ -2,8 +2,8 @@
   "name": "granular-rbac-react",
   "version": "1.0.0",
   "description": "React components and hooks for granular RBAC",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/simple-index.js",
+  "types": "dist/simple-index.d.ts",
   "files": [
     "dist/**/*",
     "README.md"
