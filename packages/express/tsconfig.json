@@ -13,6 +13,6 @@
     "declarationMap": true,
     "sourceMap": true
   },
-  "include": ["src/simple-index.ts"],
+  "include": ["src/working-index.ts"],
   "exclude": ["node_modules", "dist"]
 }
