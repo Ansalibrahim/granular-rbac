@@ -1,0 +1,102 @@
+name: Manual NPM Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: 'Package to publish'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - core
+          - react
+          - express
+      version_bump:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+          - none
+
+jobs:
+  manual-publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Determine packages to publish
+        id: packages
+        run: |
+          if [ "${{ github.event.inputs.package }}" == "all" ]; then
+            echo "packages=core react express" >> $GITHUB_OUTPUT
+          else
+            echo "packages=${{ github.event.inputs.package }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and publish packages
+        run: |
+          for package in ${{ steps.packages.outputs.packages }}; do
+            echo "Processing package: $package"
+            cd packages/$package
+            
+            # Install dependencies and build
+            npm ci --ignore-scripts || npm install --ignore-scripts
+            npm run build
+            
+            # Bump version if requested
+            if [ "${{ github.event.inputs.version_bump }}" != "none" ]; then
+              npm version ${{ github.event.inputs.version_bump }} --no-git-tag-version
+            fi
+            
+            # Get package info
+            PACKAGE_NAME=$(node -p "require('./package.json').name")
+            PACKAGE_VERSION=$(node -p "require('./package.json').version")
+            
+            echo "Publishing $PACKAGE_NAME@$PACKAGE_VERSION..."
+            
+            # Publish to npm
+            npm publish --access public
+            
+            echo "✅ Successfully published $PACKAGE_NAME@$PACKAGE_VERSION"
+            
+            # Return to root directory
+            cd ../..
+          done
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create release summary
+        run: |
+          echo "# 📦 Manual NPM Publish Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Published Packages" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          for package in ${{ steps.packages.outputs.packages }}; do
+            cd packages/$package
+            PACKAGE_NAME=$(node -p "require('./package.json').name")
+            PACKAGE_VERSION=$(node -p "require('./package.json').version")
+            echo "- ✅ **$PACKAGE_NAME**: v$PACKAGE_VERSION" >> $GITHUB_STEP_SUMMARY
+            cd ../..
+          done
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Installation" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo 'npm install granular-rbac-core granular-rbac-react granular-rbac-express' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY

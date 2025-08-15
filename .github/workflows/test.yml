@@ -1,0 +1,107 @@
+name: Test Packages
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x, 20.x]
+        package: [core, react, express]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          cd packages/${{ matrix.package }}
+          npm ci --ignore-scripts || npm install --ignore-scripts
+
+      - name: Run linter
+        run: |
+          cd packages/${{ matrix.package }}
+          npm run lint --if-present
+
+      - name: Run tests
+        run: |
+          cd packages/${{ matrix.package }}
+          npm test --if-present
+
+      - name: Build package
+        run: |
+          cd packages/${{ matrix.package }}
+          npm run build
+
+      - name: Test package installation
+        run: |
+          cd packages/${{ matrix.package }}
+          npm pack
+          cd /tmp
+          npm init -y
+          npm install $GITHUB_WORKSPACE/packages/${{ matrix.package }}/*.tgz
+          node -e "console.log('Package installation test passed')"
+
+  type-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Type check all packages
+        run: |
+          for package in core react express; do
+            echo "Type checking $package..."
+            cd packages/$package
+            npm ci --ignore-scripts || npm install --ignore-scripts
+            npx tsc --noEmit --skipLibCheck
+            cd ../..
+          done
+
+  coverage:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Run coverage
+        run: |
+          for package in core react express; do
+            echo "Running coverage for $package..."
+            cd packages/$package
+            npm ci --ignore-scripts || npm install --ignore-scripts
+            npm run test:coverage --if-present || echo "No coverage script found for $package"
+            cd ../..
+          done
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          directory: ./packages/
+          fail_ci_if_error: false
