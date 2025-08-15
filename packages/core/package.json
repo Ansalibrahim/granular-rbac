@@ -1,0 +1,55 @@
+{
+  "name": "granular-rbac-core",
+  "version": "1.0.0",
+  "description": "Core library for granular role-based access control with UI-level permissions",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "keywords": [
+    "rbac",
+    "permissions",
+    "authorization",
+    "access-control",
+    "roles",
+    "typescript",
+    "sequelize",
+    "multi-tenant"
+  ],
+  "author": "HashBoosh",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hashboosh/granular-rbac.git",
+    "directory": "packages/core"
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "sequelize": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0",
+    "eslint": "^8.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "sequelize": "^6.35.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

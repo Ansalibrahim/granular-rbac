@@ -1,0 +1,40 @@
+{
+  "name": "granular-rbac",
+  "version": "1.0.0",
+  "description": "Granular Role-Based Access Control library with UI-component level permissions",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "dev": "npm run dev --workspaces",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces",
+    "lint:fix": "npm run lint:fix --workspaces",
+    "clean": "npm run clean --workspaces",
+    "install:all": "npm install --workspaces",
+    "publish:all": "npm publish --workspaces"
+  },
+  "keywords": [
+    "rbac",
+    "permissions",
+    "authorization",
+    "access-control",
+    "roles",
+    "typescript",
+    "react",
+    "express",
+    "multi-tenant"
+  ],
+  "author": "HashBoosh",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hashboosh/granular-rbac.git"
+  },
+  "devDependencies": {
+    "lerna": "^8.0.0",
+    "typescript": "^5.0.0"
+  }
+}

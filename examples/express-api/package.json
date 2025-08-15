@@ -1,0 +1,20 @@
+{
+  "name": "granular-rbac-express-example",
+  "version": "1.0.0",
+  "description": "Express API example for granular RBAC",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "granular-rbac-core": "file:../../packages/core",
+    "granular-rbac-express": "file:../../packages/express",
+    "express": "^4.18.0",
+    "sequelize": "^6.35.0",
+    "sqlite3": "^5.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  }
+}

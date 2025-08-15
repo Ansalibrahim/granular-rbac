@@ -1,0 +1,18 @@
+{
+  "name": "granular-rbac-basic-example",
+  "version": "1.0.0",
+  "description": "Basic usage example for granular RBAC",
+  "private": true,
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "granular-rbac-core": "file:../../packages/core",
+    "sequelize": "^6.35.0",
+    "sqlite3": "^5.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  }
+}
