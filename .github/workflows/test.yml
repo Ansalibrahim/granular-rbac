@@ -27,9 +27,9 @@ jobs:
           # Removed cache since packages don't have package-lock.json
 
       - name: Install dependencies
-          run: |
-            cd packages/${{ matrix.package }}
-            npm install --ignore-scripts --legacy-peer-deps
+        run: |
+          cd packages/${{ matrix.package }}
+          npm install --ignore-scripts --legacy-peer-deps
 
       - name: Run linter
         run: |
