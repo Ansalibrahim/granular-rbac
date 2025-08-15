@@ -24,7 +24,7 @@ export function createUserRoleModel(sequelize: Sequelize) {
         allowNull: false,
         field: 'role_id',
         references: {
-          model: 'rbac_roles',
+          model: 'roles', // Use existing table name
           key: 'id',
         },
       },
@@ -32,7 +32,7 @@ export function createUserRoleModel(sequelize: Sequelize) {
     {
       sequelize,
       modelName: 'UserRole',
-      tableName: 'rbac_user_roles',
+      tableName: 'user_roles', // Use existing table name
       underscored: true,
       indexes: [
         {

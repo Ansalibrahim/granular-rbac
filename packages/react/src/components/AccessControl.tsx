@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import { useRBAC } from '../context';
 
 interface AccessControlProps {
@@ -6,7 +6,7 @@ interface AccessControlProps {
   permissions?: string[];
   roles?: string[];
   fallback?: ReactNode;
-  requireAll?: boolean; // Require all permissions vs any permission
+  requireAll?: boolean;
   showLoader?: boolean;
   loaderComponent?: ReactNode;
 }
@@ -18,71 +18,43 @@ export function AccessControl({
   fallback = null,
   requireAll = false,
   showLoader = false,
-  loaderComponent = null
+  loaderComponent = <div>Loading...</div>
 }: AccessControlProps) {
-  const { 
-    user, 
-    hasPermission, 
-    hasAnyPermission, 
-    hasAllPermissions,
-    hasRole,
-    hasAnyRole
-  } = useRBAC();
+  const { hasAnyPermission, hasAllPermissions, hasAnyRole, canBypassPermissions } = useRBAC();
   
-  const [hasAccess, setHasAccess] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
+  if (showLoader) {
+    return <>{loaderComponent}</>;
+  }
 
-  useEffect(() => {
-    async function checkAccess() {
-      setLoading(true);
-      
-      if (!user) {
-        setHasAccess(false);
-        setLoading(false);
-        return;
-      }
+  // If user can bypass permissions, always allow access
+  if (canBypassPermissions()) {
+    return <>{children}</>;
+  }
 
-      // If no restrictions, allow access
-      if (!permissions && !roles) {
-        setHasAccess(true);
-        setLoading(false);
-        return;
-      }
+  let hasAccess = false;
 
-      let permissionAccess = true;
-      let roleAccess = true;
-      
-      // Check permissions
-      if (permissions && permissions.length > 0) {
-        if (requireAll) {
-          permissionAccess = await hasAllPermissions(permissions);
-        } else {
-          permissionAccess = await hasAnyPermission(permissions);
-        }
-      }
-
-      // Check roles
-      if (roles && roles.length > 0) {
-        if (requireAll) {
-          roleAccess = roles.every(role => hasRole(role));
-        } else {
-          roleAccess = hasAnyRole(roles);
-        }
-      }
-
-      // Both permission and role checks must pass
-      setHasAccess(permissionAccess && roleAccess);
-      setLoading(false);
+  // Check permissions
+  if (permissions && permissions.length > 0) {
+    if (requireAll) {
+      hasAccess = hasAllPermissions(permissions);
+    } else {
+      hasAccess = hasAnyPermission(permissions);
     }
+  }
 
-    checkAccess();
-  }, [user, permissions, roles, requireAll, hasPermission, hasAnyPermission, hasAllPermissions, hasRole, hasAnyRole]);
-
-  if (loading) {
-    if (showLoader) {
-      return loaderComponent ? <>{loaderComponent}</> : <div>Loading...</div>;
+  // Check roles
+  if (roles && roles.length > 0) {
+    const roleAccess = hasAnyRole(roles);
+    if (permissions && permissions.length > 0) {
+      hasAccess = requireAll ? (hasAccess && roleAccess) : (hasAccess || roleAccess);
+    } else {
+      hasAccess = roleAccess;
     }
-    return null;
+  }
+
+  // If no permissions or roles specified, allow access
+  if ((!permissions || permissions.length === 0) && (!roles || roles.length === 0)) {
+    hasAccess = true;
   }
 
   return hasAccess ? <>{children}</> : <>{fallback}</>;

@@ -14,6 +14,6 @@
     "sourceMap": true,
     "jsx": "react-jsx"
   },
-  "include": ["src/working-index.ts"],
+  "include": ["src/working-index.ts", "src/real-implementation.tsx"],
   "exclude": ["node_modules", "dist"]
 }

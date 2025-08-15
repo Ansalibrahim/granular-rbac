@@ -103,7 +103,7 @@ export function createRoleModel(sequelize: Sequelize, config: RBACConfig) {
     {
       sequelize,
       modelName: 'Role',
-      tableName: 'rbac_roles',
+      tableName: 'roles', // Use existing table name
       underscored: true,
       indexes: [
         {

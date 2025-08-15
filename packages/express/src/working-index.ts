@@ -282,9 +282,30 @@ export function createRoleRoutes(rbac: RBAC) {
   return router;
 }
 
+// Helper middleware functions
+export const requireAdmin = () => {
+  return (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (!req.user || (req.user.userType !== 'admin' && req.user.userType !== 'superadmin')) {
+      return res.status(403).json({ message: 'Admin access required' });
+    }
+    next();
+  };
+};
+
+export const requireSuperAdmin = () => {
+  return (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (!req.user || req.user.userType !== 'superadmin') {
+      return res.status(403).json({ message: 'SuperAdmin access required' });
+    }
+    next();
+  };
+};
+
 // Export everything
 export default {
   createPermissionMiddleware,
   createRoleController,
-  createRoleRoutes
+  createRoleRoutes,
+  requireAdmin,
+  requireSuperAdmin
 };
